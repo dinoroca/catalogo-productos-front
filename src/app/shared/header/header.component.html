@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Logo</a>
+    <a class="navbar-brand" [routerLink]="['/']">Logo</a>
 
     <form class="col-8 col-md-6 col-lg-5" role="search">
       <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -13,20 +13,22 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link ms-3" aria-current="page" [routerLink]="['/']" routerLinkActive="activa">Inicio</a>
+          <a class="nav-link ms-3" aria-current="page" [routerLink]="['/']" routerLinkActive="activa">Catálogo</a>
         </li>
+        @if (authService.isAuthenticated()) {
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/products']" routerLinkActive="activa">Productos</a>
+          <a class="nav-link" [routerLink]="['/products']" routerLinkActive="activa">Mis productos</a>
         </li>
+        }
         @if (!authService.isAuthenticated()) {
         <li class="nav-item">
-          <a class="nav-link pointer" data-bs-toggle="modal" data-bs-target="#exampleModal">Inciar sesión</a>
+          <a class="nav-link pointer" data-bs-toggle="modal" data-bs-target="#loginModal">Inciar sesión</a>
         </li>
         }
         @if (authService.isAuthenticated()) {
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-user"></i> {{ authService.currentUser()?.username }}
+            <i class="bi bi-person"></i> {{ authService.currentUser()?.username }}
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#">Mis productos</a></li>
@@ -43,7 +45,7 @@
 </nav>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">

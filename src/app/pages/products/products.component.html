@@ -1,1 +1,140 @@
-<p>products works!</p>,
+<h2 class="title-with-sub text-center">Mis productos</h2>
+
+<div class="d-grid gap-2 col-6 col-md-4 mx-auto my-3">
+  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#resgistroProductos">Registrar
+    producto</button>
+</div>
+
+<!-- Modal registrar o actualizar producto -->
+<div class="modal fade" id="resgistroProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resgistroProductosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body mb-4">
+        <h1 class="fs-5 text-center">{{ isEditing ? 'Actualizar Producto' : 'Registrar Nuevo Producto' }}</h1>
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="name" formControlName="name">
+            <label for="name">Nombre del producto</label>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="description" formControlName="description">
+            <label for="description">Descripción</label>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input type="url" class="form-control" id="imageUrl" formControlName="imageUrl">
+            <label for="imageUrl">URL de imagen</label>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="price" formControlName="price">
+            <label for="price">Precio</label>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Detalles Técnicos</label>
+            <div formArrayName="technicalDetails">
+              @for (detailForm of technicalDetailsArray.controls; track $index) {
+              <div [formGroupName]="$index" class="row mb-2">
+                <div class="col-5">
+                  <input type="text" class="form-control" placeholder="Característica" formControlName="key">
+                </div>
+                <div class="col-5">
+                  <input type="text" class="form-control" placeholder="Valor" formControlName="value">
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-danger" (click)="removeTechnicalDetail($index)"
+                    [disabled]="technicalDetailsArray.length === 1">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+              }
+              <button type="button" class="btn btn-secondary btn-sm mt-2" (click)="addTechnicalDetail()">
+                Agregar detalle técnico
+              </button>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 col-6 mx-auto mt-4">
+            <button class="btn btn-primary" type="submit"
+              [disabled]="registerForm.invalid || productService.isLoading()" data-bs-dismiss="modal">
+              {{ isEditing ? 'Actualizar' : 'Registrar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Indicador de carga -->
+@if (productService.isLoading()) {
+<h4 class="font-sans">Cargando</h4>
+}
+
+<!-- Mensaje de error -->
+@if (productService.error()) {
+<div class="error">
+  {{ productService.error() }}
+</div>
+}
+
+<!-- Lista de productos -->
+@if (!productService.isLoading() && productService.productsUser().length === 0) {
+<div class="no-data">
+  No hay productos disponibles.
+</div>
+}
+
+<div class="row d-flex justify-content-center">
+  @for (product of productService.productsUser(); track $index) {
+
+  <div class="col-12 col-md-6 col-lg-4 col-xl-3 my-3">
+    <div class="card">
+      <img [src]="product.imageUrl" [alt]="product.name" class="card-img-top">
+      <div class="card-body">
+        <h6>{{ product.name }}</h6>
+        <p class="card-text">{{ product.description }}</p>
+
+        <p class="price"> <b class="fs-6">Precio: </b>
+          @if (!authService.isAuthenticated()) {
+          <a class="text-primary pointer" data-bs-toggle="modal" data-bs-target="#loginModal">Inicia sesión para ver</a>
+          } @else {
+          <span class="fs-5 text-success">
+            {{ product.price | currency: 'S/ ' }}
+          </span>
+          }
+        </p>
+
+        <tbody>
+          @for (detail of product.technicalDetails | keyvalue; track detail.key) {
+          <tr>
+            <th scope="row" class="table-light text-nowrap">{{ detail.key | titlecase }}</th>
+            <td> <small class="ms-2">{{ detail.value }}</small> </td>
+          </tr>
+          }
+        </tbody>
+
+        <div class="d-flex justify-content-between mt-3">
+          <button class="btn btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#resgistroProductos"
+            (click)="getProductUser(product._id!)">
+            <i class="bi bi-pencil"></i>
+          </button>
+
+          <button class="btn btn-outline-danger" type="button" (click)="deleteProduct(product._id!)">
+            <i class="bi bi-trash"></i>
+          </button>
+
+          <button class="btn btn-outline-success" type="button"> <i class="bi bi-download"></i> Ficha técnica</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

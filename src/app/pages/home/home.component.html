@@ -1,23 +1,58 @@
-<!-- Título en IBM Plex Serif (automáticamente) -->
-<h1>Este título principal utiliza IBM Plex Serif</h1>
+<h2 class="title-with-sub text-center">Productos</h2>
 
-<!-- Subtítulo con estilo complementario -->
-<h2 class="title-with-sub">Características del producto</h2>
-<p class="subtitle-sans">Descubre lo que hace especial a nuestro producto</p>
+<!-- Indicador de carga -->
+@if (productService.isLoading()) {
+<h4 class="font-sans">Cargando</h4>
+}
 
-<!-- Combinando estilos -->
-<div class="card">
-  <div class="card-body">
-    <h3>IBM Plex Serif para este título</h3>
-    <p>Este texto normal usa IBM Plex Sans</p>
-    <p class="ibm-serif-lead">Este párrafo destacado usa IBM Plex Serif</p>
-  </div>
+<!-- Mensaje de error -->
+@if (productService.error()) {
+<div class="error">
+  {{ productService.error() }}
 </div>
+}
 
-<!-- Cita con estilo serif -->
-<blockquote class="ibm-serif-quote">
-  La innovación distingue entre un líder y un seguidor.
-</blockquote>
+<!-- Lista de productos -->
+@if (!productService.isLoading() && productService.products().length === 0) {
+<div class="no-data">
+  No hay productos disponibles.
+</div>
+}
 
-<!-- Forzar el uso de sans en un encabezado -->
-<h4 class="font-sans">Este encabezado usa IBM Plex Sans a pesar de ser un h4</h4>
+<div class="row d-flex justify-content-center">
+  @for (product of productService.products(); track $index) {
+
+  <div class="col-12 col-md-6 col-lg-4 col-xl-3 my-3">
+    <div class="card">
+      <img [src]="product.imageUrl" [alt]="product.name" class="card-img-top">
+      <div class="card-body">
+        <h6>{{ product.name }}</h6>
+        <p class="card-text">{{ product.description }}</p>
+
+        <p class="price"> <b class="fs-6">Precio: </b>
+          @if (!authService.isAuthenticated()) {
+          <a class="text-primary pointer" data-bs-toggle="modal" data-bs-target="#loginModal">Inicia sesión para ver</a>
+          } @else {
+          <span class="fs-5 text-success">
+            {{ product.price | currency: 'S/ ' }}
+          </span>
+          }
+        </p>
+
+        <tbody>
+          @for (detail of product.technicalDetails | keyvalue; track detail.key) {
+          <tr>
+            <th scope="row" class="table-light text-nowrap">{{ detail.key | titlecase }}</th>
+            <td> <small class="ms-2">{{ detail.value }}</small> </td>
+          </tr>
+          }
+        </tbody>
+
+        <div class="d-grid gap-2 mt-3">
+          <button class="btn btn-primary" type="button"> <i class="bi bi-download me-2"></i> Ficha técnica</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { User } from '../../interfaces';
 import { ToastrService } from 'ngx-toastr';
+import { ProductService } from '../../services/product.service';
 
 
 @Component({
@@ -17,6 +18,7 @@ export class HeaderComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   public authService = inject(AuthService);
+  public productService = inject(ProductService);
   public toastr = inject(ToastrService);
 
   loginForm!: FormGroup;
@@ -57,6 +59,7 @@ export class HeaderComponent {
     this.authService.login(email, password).subscribe({
       next: () => {
         this.toastr.success('Inicio de sesión exitoso', 'Éxito!');
+        this.productService.getProducts().subscribe();
       },
       error: (error) => {
         this.toastr.error(error.message, 'Error!');
@@ -75,6 +78,7 @@ export class HeaderComponent {
     this.authService.register(username, email, password).subscribe({
       next: () => {
         this.toastr.success('Regsitro exitoso', 'Éxito!');
+        this.productService.getProducts().subscribe();
       },
       error: (error) => {
         this.toastr.error(error.message, 'Error!');
@@ -89,6 +93,7 @@ export class HeaderComponent {
 
   logout(): void {
     this.authService.logout();
+    this.productService.getProducts().subscribe();
   }
 
 }
