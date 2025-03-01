@@ -86,7 +86,27 @@ export class AuthService {
         map(response => response.user),
         catchError(error => {
           this.tokenLoaded.set(true);
-          return throwError(() => new Error(error.message || 'Error al iniciar sesión'));
+          return throwError(() => new Error(error.error.message || 'Error al iniciar sesión'));
+        })
+      );
+  }
+
+  // registro con username, email y password
+  register(username: string, email: string, password: string): Observable<User> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}auth/register`, { username, email, password })
+      .pipe(
+        tap(response => {
+          if (response.success && response.token) {
+            this.setToken(response.token);
+            this.currentUser.set(response.user);
+            this.isAuthenticated.set(true);
+            this.tokenLoaded.set(true);
+          }
+        }),
+        map(response => response.user),
+        catchError(error => {
+          this.tokenLoaded.set(true);
+          return throwError(() => new Error(error.error.message || 'Error al registrar usuario'));
         })
       );
   }
