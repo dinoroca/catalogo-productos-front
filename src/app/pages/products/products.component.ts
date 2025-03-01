@@ -2,19 +2,24 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ProductService } from '../../services/product.service';
 import { CurrencyPipe, KeyValuePipe, TitleCasePipe } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { PdfService } from '../../services/pdf.service';
 
 @Component({
   selector: 'app-products',
-  imports: [TitleCasePipe, KeyValuePipe, CurrencyPipe, ReactiveFormsModule],
+  imports: [TitleCasePipe, KeyValuePipe, CurrencyPipe, ReactiveFormsModule, FormsModule],
   templateUrl: './products.component.html',
 })
 export default class ProductsComponent implements OnInit {
   authService = inject(AuthService);
   toastr = inject(ToastrService);
   productService = inject(ProductService);
+  pdfService = inject(PdfService);
   private fb = inject(FormBuilder);
+
+  productId = '';
+  email = '';
 
   registerForm!: FormGroup;
   isEditing: boolean = false;
@@ -153,9 +158,23 @@ export default class ProductsComponent implements OnInit {
     this.getProductUser(id);
   }
 
-  cancelEdit(): void {
-    this.resetForm();
-    this.toastr.info('Edición cancelada');
+  donwnloadProductPDF(id: string): void {
+    this.pdfService.downloadProductPdf(id).subscribe();
+  }
+
+  setProductId(id: string) {
+    this.productId = id;
+  }
+
+  storeMailClient(): void {
+    this.pdfService.storeMailClient(this.productId, this.email).subscribe({
+      next: (res) => {
+        this.donwnloadProductPDF(this.productId);
+      },
+      error: (err) => {
+        this.toastr.error('No se pudo descargar el pdf', 'Error!');
+      }
+    });
   }
 
   deleteProduct(id: string): void {

@@ -2,10 +2,6 @@
   <div class="container-fluid">
     <a class="navbar-brand" [routerLink]="['/']">Logo</a>
 
-    <form class="col-8 col-md-6 col-lg-5" role="search">
-      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-    </form>
-
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -20,6 +16,9 @@
           <a class="nav-link" [routerLink]="['/products']" routerLinkActive="activa">Mis productos</a>
         </li>
         }
+      </ul>
+
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         @if (!authService.isAuthenticated()) {
         <li class="nav-item">
           <a class="nav-link pointer" data-bs-toggle="modal" data-bs-target="#loginModal">Inciar sesión</a>
@@ -37,9 +36,6 @@
         </li>
         }
       </ul>
-      <div class="">
-        <button class="btn btn-outline-success ms-3" type="submit">Search</button>
-      </div>
     </div>
   </div>
 </nav>

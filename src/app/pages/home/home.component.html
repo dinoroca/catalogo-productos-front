@@ -23,7 +23,7 @@
   @for (product of productService.products(); track $index) {
 
   <div class="col-12 col-md-6 col-lg-4 col-xl-3 my-3">
-    <div class="card">
+    <div class="card h-100">
       <img [src]="product.imageUrl" [alt]="product.name" class="card-img-top">
       <div class="card-body">
         <h6>{{ product.name }}</h6>
@@ -49,10 +49,51 @@
         </tbody>
 
         <div class="d-grid gap-2 mt-3">
-          <button class="btn btn-primary" type="button"> <i class="bi bi-download me-2"></i> Ficha técnica</button>
+          <!-- Descarga directa -->
+          @if (authService.isAuthenticated()) {
+          <button class="btn btn-primary" type="button" (click)="donwnloadProductPDF(product._id!)">
+            <i class="bi bi-download me-2"></i> Ficha técnica
+          </button>
+          }
+
+          <!-- Descarga con correo -->
+          @if (!authService.isAuthenticated()) {
+          <button class="btn btn-primary" type="button" (click)="setProductId(product._id!)" data-bs-toggle="modal"
+            data-bs-target="#descargarFichamodal">
+            <i class="bi bi-download"></i> Ficha técnicaa
+          </button>
+          }
         </div>
       </div>
     </div>
   </div>
   }
+
+  <!-- Modal ficha técnica -->
+  <div class="modal fade" id="descargarFichamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="descargarFichamodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="descargarFichamodalLabel">Descarga de ficha técnica</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body mb-4">
+          <p>Para poder descargar la ficha técnica de nuestros productos, tiene que ingresar su correo</p>
+
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="email" [(ngModel)]="email" name="email">
+            <label for="email">Correo electrónico</label>
+          </div>
+
+          <div class="d-grid gap-2 col-6 mx-auto mt-4">
+            <button class="btn btn-success" type="button" data-bs-dismiss="modal" [disabled]="email.length < 5"
+              (click)="storeMailClient()">
+              <i class="bi bi-download me-2"></i> Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
